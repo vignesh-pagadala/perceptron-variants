@@ -1,6 +1,7 @@
 # Implementation of Perceptron and other variants.
 import matplotlib.pyplot as plt
 import numpy as np
+from astropy.table import Table, Column
 
 # Generates linearly seperable data in 2-D
 
@@ -18,10 +19,11 @@ class Perceptron :
     """An implementation of the perceptron algorithm.
     Note that this implementation does not include a bias term"""
  
-    def __init__(self, max_iterations=100, learning_rate=0.2) :
+    def __init__(self, max_iterations=100, learning_rate=0.2, bias = 0) :
  
         self.max_iterations = max_iterations
         self.learning_rate = learning_rate
+        self.bias = bias
  
     def fit(self, X, y) :
         """
@@ -38,7 +40,18 @@ class Perceptron :
         Array of labels.
  
         """
+        
+
+
         self.w = np.zeros(len(X[0]))
+
+        # ADDING BIAS TERM
+
+        # Change input to accomodate bias. Tack a column of 1s.
+        X = np.insert(X, 0, 1, 1)
+        # Include bias in weight
+        self.w = np.insert(self.w, 0, self.bias)
+
         converged = False
         iterations = 0
         while (not converged and iterations <= self.max_iterations) :
@@ -75,10 +88,11 @@ class Pocket :
 	"""An implementation of the Pocket algorithm.
 	Note that this implementation does not include a bias term"""
 
-	def __init__(self, max_iterations=100, learning_rate=0.2) :
+	def __init__(self, max_iterations=100, learning_rate=0.2, bias = 0) :
 
 	    self.max_iterations = max_iterations
 	    self.learning_rate = learning_rate
+	    self.bias = bias
 
 	def fit(self, X, y) :
 	    """
@@ -97,6 +111,16 @@ class Pocket :
 	    """
 	    self.w = np.zeros(len(X[0]))
 	    self.w_pocket = np.zeros(len(X[0]))
+
+	    # ADDING BIAS TERM
+
+        # Change input to accomodate bias. Tack a column of 1s.
+	    X = np.insert(X, 0, 1, 1)
+
+        # Include bias in weights
+	    self.w = np.insert(self.w, 0, self.bias)
+	    self.w_pocket = np.insert(self.w_pocket, 0, self.bias)
+
 	    converged = False
 	    iterations = 0
 	    while (not converged and iterations <= self.max_iterations) :
@@ -153,10 +177,11 @@ class Adatron :
 	"""An implementation of the perceptron algorithm.
 	Note that this implementation does not include a bias term"""
 
-	def __init__(self, max_iterations=100, learning_rate=0.2) :
+	def __init__(self, max_iterations=100, learning_rate=0.2, bias = 0) :
 
 	    self.max_iterations = max_iterations
 	    self.learning_rate = learning_rate
+	    self.bias = bias
 
 	def fit(self, X, y) :
 	    """
@@ -176,6 +201,14 @@ class Adatron :
 	    alpha = np.ones(len(X))
 	    # Calculate weight
 	    self.w = np.zeros(len(X[0]))
+
+     	# ADDING BIAS TERM
+
+        # Change input to accomodate bias. Tack a column of 1s.
+	    X = np.insert(X, 0, 1, 1)
+        # Include bias in weight
+	    self.w = np.insert(self.w, 0, self.bias)
+
 	    for i in range(len(X)):
 	    	self.w = self.w + alpha[i] * y[i] * X[i]
 
@@ -230,15 +263,41 @@ class Adatron :
 if __name__ == '__main__':
 	
 	X,y,w = generate_separable_data(40)
-	
+	print(X)
+	print(y)
 	train_data = np.genfromtxt("gisette_train.data", delimiter = " ")
 	valid_data = np.genfromtxt("gisette_valid.data", delimiter = " ")
-	#X = np.concatenate((train_data, valid_data), axis = 0)
+	X = np.concatenate((train_data, valid_data), axis = 0)
 	train_labels = np.genfromtxt("gisette_train.labels", delimiter = " ")
 	valid_labels = np.genfromtxt("gisette_valid.labels", delimiter = " ")
-	#y = np.concatenate((train_labels, valid_labels), axis = 0)
-	#p1 = Perceptron()
-	#p1.fit(X, y)
+	y = np.concatenate((train_labels, valid_labels), axis = 0)
+	p1 = Perceptron(bias = 10)
+	p1.fit(X, y)
 
-	p = Adatron()
-	p.fit(X, y)
+	#p = Pocket(bias = 10)
+	#p.fit(X, y)
+	
+
+	# QSAR DATASET
+	#data = np.genfromtxt("biodeg.csv", delimiter = ',')
+	#print(type(data))
+	#print(data[0, :])
+	#print(data.shape)
+	
+	#REMOVE NANS
+	#data = data[~np.isnan(data).any(axis=1)]
+	#print(data.shape)
+	#FIRST STEP IS TO EXTRACT THE LAST COLUMN
+	#outdata = data[:,-1]# np.genfromtxt("processed.cleveland.data", delimiter = ",", usecols = -1)
+
+	# PROCESS INTO -1 AND 1
+	# EXPECTED OUTPUTS
+	#outdata[outdata > 0] = -1
+	#outdata[outdata == 0] = 1
+	#print(outdata.shape)
+
+	# INPUTS
+	#indata = np.delete(data, -1, 1)
+
+	#data = np.genfromtxt("cleveland.data", delimiter = ",")
+	

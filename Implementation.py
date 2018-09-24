@@ -262,6 +262,7 @@ class Adatron :
 
 if __name__ == '__main__':
 	
+	# Change
 	X,y,w = generate_separable_data(40)
 	print(X)
 	print(y)
